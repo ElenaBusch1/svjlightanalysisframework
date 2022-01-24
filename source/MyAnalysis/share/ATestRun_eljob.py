@@ -19,7 +19,7 @@ import os
 sh = ROOT.SH.SampleHandler()
 sh.setMetaString( 'nc_tree', 'CollectionTree' )
 #inputFilePath = os.getenv( 'ALRB_TutorialData' ) + '/mc16_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.deriv.DAOD_PHYS.e6337_s3126_r10201_p4172/'
-inputFilePath = '/afs/cern.ch/work/e/ebusch/public/SVJ/mc16_13TeV'
+inputFilePath = '/eos/atlas/atlascerngroupdisk/phys-exotics/jdm/svjets-schannel/cutflow/mc16_13TeV.508548.MGPy8EG_SVJSChan_1500_3.deriv.DAOD_PHYS.e8357_s3126_r10201_p4838/'
 #ROOT.SH.ScanDir().filePattern( 'DAOD_PHYS.21569875._001323.pool.root.1' ).scan( sh, inputFilePath ) #tutorial
 ROOT.SH.ScanDir().filePattern( 'DAOD_PHYS.27236297._000003.pool.root.1' ).scan( sh, inputFilePath ) #analysis
 sh.printContent()
@@ -47,8 +47,8 @@ from AnaAlgorithm.DualUseConfig import addPrivateTool
 addPrivateTool( alg, 'grlTool', 'GoodRunsListSelectionTool' )
 
 # configure the properties of the GRL tool
-fullGRLFilePath = os.getenv ("ALRB_TutorialData") + "/data16_13TeV.periodAllYear_DetStatus-v89-pro21-01_DQDefects-00-02-04_PHYS_StandardGRL_All_Good_25ns.xml"
-alg.grlTool.GoodRunsListVec = [ fullGRLFilePath ]
+#fullGRLFilePath = os.getenv ("ALRB_TutorialData") + "/data16_13TeV.periodAllYear_DetStatus-v89-pro21-01_DQDefects-00-02-04_PHYS_StandardGRL_All_Good_25ns.xml"
+#alg.grlTool.GoodRunsListVec = [ fullGRLFilePath ]
 alg.grlTool.PassThrough = 0 # if true (default) will ignore result of GRL and will just pass all events
 
 # Add our algorithm to the job
