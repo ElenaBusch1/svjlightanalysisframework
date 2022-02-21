@@ -45,10 +45,21 @@ private:
   unsigned int m_runNumber = 0; ///< Run number
   unsigned long long m_eventNumber = 0; ///< Event number
   /// Jet 4-momentum variables
-  std::vector<float> *m_jetEta = nullptr;
-  std::vector<float> *m_jetPhi = nullptr;
-  std::vector<float> *m_jetPt = nullptr;
-  std::vector<float> *m_jetE = nullptr;
+  //std::vector<float> *m_jet1Eta = nullptr;
+  //std::vector<float> *m_jet1Phi = nullptr;
+  //std::vector<float> *m_jet1Pt = nullptr;
+  //std::vector<float> *m_jet1E = nullptr;
+  float m_LargeRJets[2][4] = {};
+  float m_LargeRJets_constituents[2][20][3] = {};
+ 
+  float m_jet1D2 = 0;
+  float m_jet2D2 = 0;
+  float m_jet1Tau32 = 0;
+  float m_jet2Tau32 = 0;
+  float m_jet1Split12 = 0;
+  float m_jet2Split12 = 0;
+  float m_jet1Split23 = 0;
+  float m_jet2Split23 = 0;
   /// \}
 };
 
