@@ -7,6 +7,8 @@ parser = optparse.OptionParser()
 parser.add_option( '-s', '--submission-dir', dest = 'submission_dir',
                    action = 'store', type = 'string', default = 'submitDir',
                    help = 'Submission directory for EventLoop' )
+parser.add_option('-d', '--fileDirectory', type = 'string')
+parser.add_option('-f', '--fileName', type = 'string')
 ( options, args ) = parser.parse_args()
 
 # Set up (Py)ROOT.
@@ -20,10 +22,11 @@ sh = ROOT.SH.SampleHandler()
 sh.setMetaString( 'nc_tree', 'CollectionTree' )
 #inputFilePath = os.getenv( 'ALRB_TutorialData' ) + '/mc16_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.deriv.DAOD_PHYS.e6337_s3126_r10201_p4172/' #tutorial
 #inputFilePath = '/afs/cern.ch/work/e/ebusch/public/SVJ/mc16_13TeV' #cutflow
-inputFilePath = '/afs/cern.ch/work/e/ebusch/public/SVJ/data/EXOT3' #exot3
+inputFilePath = '/afs/cern.ch/work/e/ebusch/public/SVJ/data/fullEXOT3/'+options.fileDirectory 
 #ROOT.SH.ScanDir().filePattern( 'DAOD_PHYS.21569875._001323.pool.root.1' ).scan( sh, inputFilePath ) #tutorial
 #ROOT.SH.ScanDir().filePattern( 'DAOD_PHYS.27236297._000003.pool.root.1' ).scan( sh, inputFilePath ) #cutflow
-ROOT.SH.ScanDir().filePattern( 'DAOD_EXOT3.test.508547.SVJSChan_1500_8.p9364.root' ).scan( sh, inputFilePath ) #jetm9
+#ROOT.SH.ScanDir().filePattern( 'DAOD_EXOT3.test.508547.SVJSChan_1500_8.p9364.root' ).scan( sh, inputFilePath ) #jetm9
+ROOT.SH.ScanDir().filePattern( options.fileName ).scan( sh, inputFilePath ) #jetm9
 sh.printContent()
 
 # Create an EventLoop job.

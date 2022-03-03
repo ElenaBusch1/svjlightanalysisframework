@@ -13,6 +13,9 @@
 // Jets
 #include "xAODParticleEvent/IParticleLink.h"
 #include "xAODParticleEvent/IParticleLinkContainer.h"
+// MET
+#include "xAODMissingET/MissingET.h"
+#include "xAODMissingET/MissingETContainer.h"
 
 class MyxAODAnalysis : public EL::AnaAlgorithm
 {
@@ -60,6 +63,15 @@ private:
   float m_jet2Split12 = 0;
   float m_jet1Split23 = 0;
   float m_jet2Split23 = 0;
+
+  float m_Ht = 0;
+  float m_MET_met = 0;
+  float m_MET_phi = 0;
+  float m_dPhi_jet0_met = 0;
+  float m_dPhi_jet1_met = 0;
+  float m_dPhi_jetClosest_met = 0;
+  float m_MaxPhiMinPhi = 0;
+  float m_pt_balance = 0;
   /// \}
 };
 
