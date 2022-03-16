@@ -18,6 +18,9 @@ Instructions (general):
 7. nTuple is in submitDir/data-ANALYSIS
 8. Currently setting up with `asetup AnalysisBase 21.2.189`
 
+Notes on this version:
+1. This branch is dedicated to creating nTuple which focus on max\_phi and min\_phi jets, not leading and subleading
+
 Notes:
 1. Input file is currently hardcoded in ATestRun\_eljob.py . Set to your desired input (samples in /eos/atlas/atlascerngroupdisk/phys-exotics/jdm/svjets-schannel/cutflow suggested)
 

@@ -64,12 +64,13 @@ private:
   float m_jet1Split23 = 0;
   float m_jet2Split23 = 0;
 
+  int m_nJets = 0;
   float m_Ht = 0;
   float m_MET_met = 0;
   float m_MET_phi = 0;
-  float m_dPhi_jet0_met = 0;
-  float m_dPhi_jet1_met = 0;
-  float m_dPhi_jetClosest_met = 0;
+  float m_dPhi_max = 0;
+  float m_dPhi_min = 0;
+  //float m_dPhi_jetClosest_met = 0;
   float m_MaxPhiMinPhi = 0;
   float m_pt_balance = 0;
   /// \}

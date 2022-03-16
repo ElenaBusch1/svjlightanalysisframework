@@ -67,12 +67,12 @@ StatusCode MyxAODAnalysis :: initialize ()
   mytree->Branch ("Jet2_Split12", &m_jet2Split12);
   mytree->Branch ("Jet2_Split23", &m_jet2Split23);
   
+  mytree->Branch ("nJets", &m_nJets);
   mytree->Branch ("Ht", &m_Ht);
   mytree->Branch ("MET_met", &m_MET_met);
   mytree->Branch ("MET_phi", &m_MET_phi);
-  mytree->Branch ("dPhi_jet0_met", &m_dPhi_jet0_met);
-  mytree->Branch ("dPhi_jet1_met", &m_dPhi_jet1_met);
-  mytree->Branch ("dPhi_jetClosest_met", &m_dPhi_jetClosest_met);
+  mytree->Branch ("dPhi_min", &m_dPhi_min);
+  mytree->Branch ("dPhi_max", &m_dPhi_max);
   mytree->Branch ("MaxPhiMinPhi", &m_MaxPhiMinPhi);
   mytree->Branch ("pt_balance", &m_pt_balance);
 
@@ -256,12 +256,29 @@ StatusCode MyxAODAnalysis :: execute ()
   //ANA_CHECK (evtStore()->retrieve (jets, "AntiKt4EMPFlowJets")); // tutorial
   ANA_CHECK (evtStore()->retrieve (jets, "AntiKt10LCTopoTrimmedPtFrac5SmallR20Jets")); // analysis
   //ANA_MSG_INFO ("execute(): number of jets = " << jets->size());
-  unsigned int i = 0; // jet counter
+  int j = 0; // jet counter
+  float maxphi = 0;
+  float minphi = 10; 
+  float n_maxphi = 0;
+  float n_minphi = 0;
   for (const xAOD::Jet* jet : *jets) {
-    if (i>= 2) {break;}
-    //if (i==0 && jet->pt() < 1.2) return StatusCode::SUCCESS; // go to the next event -> exclude jet1_pt < 1.2 TeV 
+    float dPhi = jet->phi() - m_MET_phi;
+    if(dPhi > 3.14)  dPhi -= 2*3.14;
+    if(dPhi < -3.14) dPhi += 2*3.14;
+    if (fabs(dPhi) > maxphi){maxphi = fabs(dPhi); n_maxphi = j;}
+    if (fabs(dPhi) < minphi){minphi = fabs(dPhi); n_minphi = j;}
+    j++;
+  }
+  m_nJets = j;
 
-    if(i==1) hist ("h_jet1Pt")->Fill (jet->pt() * 0.001); // GeV
+  unsigned int k = 0; // jet counter
+  unsigned int i = 0; // jet index (0 = minphi , 1 maxphi)
+  for (const xAOD::Jet* jet : *jets) {
+    if (k != n_maxphi && k != n_minphi){k++; continue;}
+    if (k == n_minphi) i = 0;
+    if (k == n_maxphi) i = 1;
+ 
+    if(i==0) hist ("h_jet1Pt")->Fill (jet->pt() * 0.001); // GeV
     //std::vector< std::vector< float > > constituents = jet->auxdataConst< std::vector< std::vector<float> > >("Constituent4Vectors");
     m_LargeRJets[i][0] = jet->pt() * 1.e-3;
     m_LargeRJets[i][1] = jet->eta();
@@ -269,8 +286,8 @@ StatusCode MyxAODAnalysis :: execute ()
     m_LargeRJets[i][3] = jet->m() * 1.e-3;
 
     // MET dPhi
-    if(i==0) m_dPhi_jet0_met = fabs(m_LargeRJets[i][2] - m_MET_phi);
-    if(i==1) m_dPhi_jet1_met = fabs(m_LargeRJets[i][2] - m_MET_phi);
+    if(i==0) m_dPhi_min = minphi; // fabs(m_LargeRJets[i][2] - m_MET_phi);
+    if(i==1) m_dPhi_max = maxphi; //fabs(m_LargeRJets[i][2] - m_MET_phi);
 
     // D2
     const float& ecf1 = jet->getAttribute<float>("ECF1");
@@ -332,15 +349,19 @@ StatusCode MyxAODAnalysis :: execute ()
         j++;
     } // end loop over links
 
-  i++;
   } // end for loop over jets 
 
   // key observables
   m_Ht = m_LargeRJets[0][0] + m_LargeRJets[1][0];
-  m_dPhi_jetClosest_met = std::min(m_dPhi_jet0_met, m_dPhi_jet1_met);
-  m_MaxPhiMinPhi = fabs(m_dPhi_jet0_met - m_dPhi_jet1_met);
+  //m_dPhi_jetClosest_met = minphi; //std::min(m_dPhi_jet0_met, m_dPhi_jet1_met);
+  m_MaxPhiMinPhi = maxphi - minphi; //fabs(m_dPhi_jet0_met - m_dPhi_jet1_met);
   // TODO : pt_balance
-
+  TLorentzVector v1, v2, v12;
+  v1.SetPtEtaPhiM(m_LargeRJets[0][0], m_LargeRJets[0][1], m_LargeRJets[0][2], m_LargeRJets[0][3]);
+  v2.SetPtEtaPhiM(m_LargeRJets[1][0], m_LargeRJets[1][1], m_LargeRJets[1][2], m_LargeRJets[1][3]);
+  v12 = v1 + v2;
+  m_pt_balance = v12.Pt() / (v1.Pt() + v2.Pt()); 
+  
   // Read/fill the EventInfo variables:
   const xAOD::EventInfo* ei = nullptr;
   ANA_CHECK (evtStore()->retrieve (ei, "EventInfo"));
