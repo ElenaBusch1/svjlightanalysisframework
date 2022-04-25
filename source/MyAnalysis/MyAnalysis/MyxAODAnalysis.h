@@ -41,6 +41,10 @@ private:
   /// Sample name
   std::string m_sampleName;
 
+  // temp
+  unsigned int n_svj = 0;
+  unsigned int n_asvj = 0;
+
   ToolHandle<IGoodRunsListSelectionTool> m_grl;
 
   /// output variables for the current event
@@ -52,17 +56,25 @@ private:
   //std::vector<float> *m_jet1Phi = nullptr;
   //std::vector<float> *m_jet1Pt = nullptr;
   //std::vector<float> *m_jet1E = nullptr;
-  float m_LargeRJets[2][4] = {};
+  float m_LargeRJets[4][4] = {};
   float m_LargeRJets_constituents[2][20][3] = {};
  
   float m_jet1D2 = 0;
-  float m_jet2D2 = 0;
   float m_jet1Tau32 = 0;
-  float m_jet2Tau32 = 0;
   float m_jet1Split12 = 0;
-  float m_jet2Split12 = 0;
   float m_jet1Split23 = 0;
+  float m_jet2D2 = 0;
+  float m_jet2Tau32 = 0;
+  float m_jet2Split12 = 0;
   float m_jet2Split23 = 0;
+  float m_jetSD2 = 0;
+  float m_jetSTau32 = 0;
+  float m_jetSSplit12 = 0;
+  float m_jetSSplit23 = 0;
+  float m_jetAD2 = 0;
+  float m_jetATau32 = 0;
+  float m_jetASplit12 = 0;
+  float m_jetASplit23 = 0;
 
   int m_nJets = 0;
   float m_Ht = 0;
@@ -70,6 +82,11 @@ private:
   float m_MET_phi = 0;
   float m_dPhi_max = 0;
   float m_dPhi_min = 0;
+  float m_mjj = 0;
+  float m_mjj_lsl = 0;
+  float m_mt = 0;
+  float m_mt_lsl = 0;
+
   //float m_dPhi_jetClosest_met = 0;
   float m_MaxPhiMinPhi = 0;
   float m_pt_balance = 0;

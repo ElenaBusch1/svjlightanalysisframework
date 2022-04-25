@@ -23,5 +23,5 @@ if (NOT XAOD_STANDALONE)
 endif ()
 
 # Install files from the package:
-atlas_install_joboptions( share/*_jobOptions.py )
+#atlas_install_joboptions( share/*_jobOptions.py )
 atlas_install_scripts( share/*.py )

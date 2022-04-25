@@ -4,6 +4,12 @@
 #include <math.h>
 #include <algorithm>
 
+#include "xAODTruth/xAODTruthHelpers.h"
+#include "xAODTruth/TruthParticleAuxContainer.h"
+#include "xAODTruth/TruthParticleContainer.h"
+#include "xAODTruth/TruthVertex.h"
+#include "xAODTruth/TruthParticle.h"
+
 MyxAODAnalysis :: MyxAODAnalysis (const std::string& name,
                                   ISvcLocator *pSvcLocator)
     : EL::AnaAlgorithm (name, pSvcLocator),
@@ -33,7 +39,6 @@ StatusCode MyxAODAnalysis :: initialize ()
   // trees.  This method gets called before any input files are
   // connected.
   ANA_MSG_INFO("in initialize");
-  ANA_CHECK (book (TH1F ("h_jet1Pt", "h_jet1Pt", 100, 0, 500))); // jet pt [GeV]
 
   //ANA_MSG_INFO( "ElectronPtCut = " << m_electronPtCut );
   ANA_MSG_INFO( "SampleName    = " << m_sampleName );
@@ -45,28 +50,47 @@ StatusCode MyxAODAnalysis :: initialize ()
   mytree->Branch ("runNumber", &m_runNumber);
   mytree->Branch ("eventNumber", &m_eventNumber);
 
-  //float m_LargeRJets[2][4]={}; // !
+  // temp variables
+  mytree->Branch ("n_svj", &n_svj);
+  mytree->Branch ("n_asvj", &n_asvj);
 
+  // Jet Kinematics
   mytree->Branch ("Jet1Pt", &m_LargeRJets[0][0]);
   mytree->Branch ("Jet1Eta", &m_LargeRJets[0][1]);
   mytree->Branch ("Jet1Phi", &m_LargeRJets[0][2]);
   mytree->Branch ("Jet1M", &m_LargeRJets[0][3]);
-
   mytree->Branch ("Jet2Pt", &m_LargeRJets[1][0]);
   mytree->Branch ("Jet2Eta", &m_LargeRJets[1][1]);
   mytree->Branch ("Jet2Phi", &m_LargeRJets[1][2]);
   mytree->Branch ("Jet2M", &m_LargeRJets[1][3]);
- 
+  mytree->Branch ("JetSPt", &m_LargeRJets[2][0]);
+  mytree->Branch ("JetSEta", &m_LargeRJets[2][1]);
+  mytree->Branch ("JetSPhi", &m_LargeRJets[2][2]);
+  mytree->Branch ("JetSM", &m_LargeRJets[2][3]);
+  mytree->Branch ("JetAPt", &m_LargeRJets[3][0]);
+  mytree->Branch ("JetAEta", &m_LargeRJets[3][1]);
+  mytree->Branch ("JetAPhi", &m_LargeRJets[3][2]);
+  mytree->Branch ("JetAM", &m_LargeRJets[3][3]);
+
+  // Jet Substructure
   mytree->Branch ("Jet1_D2", &m_jet1D2);
   mytree->Branch ("Jet1_Tau32", &m_jet1Tau32);
   mytree->Branch ("Jet1_Split12", &m_jet1Split12);
   mytree->Branch ("Jet1_Split23", &m_jet1Split23);
-
   mytree->Branch ("Jet2_D2", &m_jet2D2);
   mytree->Branch ("Jet2_Tau32", &m_jet2Tau32);
   mytree->Branch ("Jet2_Split12", &m_jet2Split12);
   mytree->Branch ("Jet2_Split23", &m_jet2Split23);
+  mytree->Branch ("JetS_D2", &m_jetSD2);
+  mytree->Branch ("JetS_Tau32", &m_jetSTau32);
+  mytree->Branch ("JetS_Split12", &m_jetSSplit12);
+  mytree->Branch ("JetS_Split23", &m_jetSSplit23);
+  mytree->Branch ("JetA_D2", &m_jetAD2);
+  mytree->Branch ("JetA_Tau32", &m_jetATau32);
+  mytree->Branch ("JetA_Split12", &m_jetASplit12);
+  mytree->Branch ("JetA_Split23", &m_jetASplit23);
   
+  // SVJ sensitive variables
   mytree->Branch ("nJets", &m_nJets);
   mytree->Branch ("Ht", &m_Ht);
   mytree->Branch ("MET_met", &m_MET_met);
@@ -75,10 +99,12 @@ StatusCode MyxAODAnalysis :: initialize ()
   mytree->Branch ("dPhi_max", &m_dPhi_max);
   mytree->Branch ("MaxPhiMinPhi", &m_MaxPhiMinPhi);
   mytree->Branch ("pt_balance", &m_pt_balance);
+  mytree->Branch ("mjj_lsl", &m_mjj_lsl);
+  mytree->Branch ("mjj", &m_mjj);
+  mytree->Branch ("mt_lsl", &m_mt_lsl);
+  mytree->Branch ("mt", &m_mt);  
 
-  //float m_LargeRJets_constituents[2][20][3]={}; // !
-
-  // Jet 1 constituents
+  // Jet SVJ constituents
   mytree->Branch ("Jet1Constituent1Pt",  &m_LargeRJets_constituents[0][0][0]);
   mytree->Branch ("Jet1Constituent1Eta", &m_LargeRJets_constituents[0][0][1]);
   mytree->Branch ("Jet1Constituent1Phi", &m_LargeRJets_constituents[0][0][2]);
@@ -140,7 +166,7 @@ StatusCode MyxAODAnalysis :: initialize ()
   mytree->Branch ("Jet1Constituent20Eta", &m_LargeRJets_constituents[0][19][1]);
   mytree->Branch ("Jet1Constituent20Phi", &m_LargeRJets_constituents[0][19][2]);
   
-  // Jet 2 constituents
+  // Jet anti-SVJ constituents
   mytree->Branch ("Jet2Constituent1Pt",  &m_LargeRJets_constituents[1][0][0]);
   mytree->Branch ("Jet2Constituent1Eta", &m_LargeRJets_constituents[1][0][1]);
   mytree->Branch ("Jet2Constituent1Phi", &m_LargeRJets_constituents[1][0][2]);
@@ -236,11 +262,7 @@ StatusCode MyxAODAnalysis :: execute ()
     }
   } // end if not MC
 
-  //ANA_MSG_INFO ("keep event: GRL");
-
-  // print out run and event number from retrieved object
-  //ANA_MSG_INFO ("execute(): runNumber = " << eventInfo->runNumber() << ", eventNumber = " << eventInfo->eventNumber());
-
+  
 
   // MET
   const xAOD::MissingETContainer *m_metCont = nullptr;
@@ -259,26 +281,26 @@ StatusCode MyxAODAnalysis :: execute ()
   int j = 0; // jet counter
   float maxphi = 0;
   float minphi = 10; 
-  float n_maxphi = 0;
-  float n_minphi = 0;
+
   for (const xAOD::Jet* jet : *jets) {
     float dPhi = jet->phi() - m_MET_phi;
     if(dPhi > 3.14)  dPhi -= 2*3.14;
     if(dPhi < -3.14) dPhi += 2*3.14;
-    if (fabs(dPhi) > maxphi){maxphi = fabs(dPhi); n_maxphi = j;}
-    if (fabs(dPhi) < minphi){minphi = fabs(dPhi); n_minphi = j;}
+    if (fabs(dPhi) > maxphi){maxphi = fabs(dPhi); n_asvj = j;}
+    if (fabs(dPhi) < minphi){minphi = fabs(dPhi); n_svj = j;}
     j++;
   }
   m_nJets = j;
 
+  m_Ht = 0;
   unsigned int k = 0; // jet counter
   unsigned int i = 0; // jet index (0 = minphi , 1 maxphi)
   for (const xAOD::Jet* jet : *jets) {
-    if (k != n_maxphi && k != n_minphi){k++; continue;}
-    if (k == n_minphi) i = 0;
-    if (k == n_maxphi) i = 1;
- 
-    if(i==0) hist ("h_jet1Pt")->Fill (jet->pt() * 0.001); // GeV
+    //if (k != n_asvj && k != n_svj && k != 0 && k != 1){m_HT += jet->pt(); k++; continue;}
+    if (k != 0 && k != 1){k++; continue;}
+    i = k;
+    k++;
+
     //std::vector< std::vector< float > > constituents = jet->auxdataConst< std::vector< std::vector<float> > >("Constituent4Vectors");
     m_LargeRJets[i][0] = jet->pt() * 1.e-3;
     m_LargeRJets[i][1] = jet->eta();
@@ -360,8 +382,14 @@ StatusCode MyxAODAnalysis :: execute ()
   v1.SetPtEtaPhiM(m_LargeRJets[0][0], m_LargeRJets[0][1], m_LargeRJets[0][2], m_LargeRJets[0][3]);
   v2.SetPtEtaPhiM(m_LargeRJets[1][0], m_LargeRJets[1][1], m_LargeRJets[1][2], m_LargeRJets[1][3]);
   v12 = v1 + v2;
+  double v12_dot = v1*v2;
+  if (v1.Pt() < 500) return StatusCode::SUCCESS;
+  //if (v12.M() < 1300) return StatusCode::SUCCESS;  
   m_pt_balance = v12.Pt() / (v1.Pt() + v2.Pt()); 
-  
+  m_mjj_lsl = sqrt(v12_dot);
+  if (sqrt(v12_dot) < 1300) return StatusCode::SUCCESS;
+  //m_mt_lsl = v12_dot.Mt();
+
   // Read/fill the EventInfo variables:
   const xAOD::EventInfo* ei = nullptr;
   ANA_CHECK (evtStore()->retrieve (ei, "EventInfo"));

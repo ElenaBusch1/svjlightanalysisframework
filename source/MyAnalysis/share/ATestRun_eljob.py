@@ -54,7 +54,7 @@ addPrivateTool( alg, 'grlTool', 'GoodRunsListSelectionTool' )
 # configure the properties of the GRL tool
 #fullGRLFilePath = os.getenv ("ALRB_TutorialData") + "/data16_13TeV.periodAllYear_DetStatus-v89-pro21-01_DQDefects-00-02-04_PHYS_StandardGRL_All_Good_25ns.xml"
 #alg.grlTool.GoodRunsListVec = [ fullGRLFilePath ]
-alg.grlTool.PassThrough = 0 # if true (default) will ignore result of GRL and will just pass all events
+alg.grlTool.PassThrough = 1 # if true (default) will ignore result of GRL and will just pass all events
 
 # Add our algorithm to the job
 job.algsAdd( alg )
