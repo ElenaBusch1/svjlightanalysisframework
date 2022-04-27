@@ -24,3 +24,5 @@ Notes on this version:
 Notes:
 1. Input file is currently hardcoded in ATestRun\_eljob.py . Set to your desired input (samples in /eos/atlas/atlascerngroupdisk/phys-exotics/jdm/svjets-schannel/cutflow suggested)
 
+Notes on R21 -> R22:
+1. Modify in MyxAODAnalysis.cxx: #include '<AsgTools/MessageCheck.h>' -> '#include <AsgMessaging/MessageCheck.h>'

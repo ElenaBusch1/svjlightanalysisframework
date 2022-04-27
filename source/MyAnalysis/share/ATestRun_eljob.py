@@ -22,7 +22,7 @@ sh = ROOT.SH.SampleHandler()
 sh.setMetaString( 'nc_tree', 'CollectionTree' )
 #inputFilePath = os.getenv( 'ALRB_TutorialData' ) + '/mc16_13TeV.410470.PhPy8EG_A14_ttbar_hdamp258p75_nonallhad.deriv.DAOD_PHYS.e6337_s3126_r10201_p4172/' #tutorial
 #inputFilePath = '/afs/cern.ch/work/e/ebusch/public/SVJ/mc16_13TeV' #cutflow
-inputFilePath = '/afs/cern.ch/work/e/ebusch/public/SVJ/data/fullEXOT3/'+options.fileDirectory 
+inputFilePath = '/afs/cern.ch/work/e/ebusch/public/SVJ/data/'+options.fileDirectory 
 #ROOT.SH.ScanDir().filePattern( 'DAOD_PHYS.21569875._001323.pool.root.1' ).scan( sh, inputFilePath ) #tutorial
 #ROOT.SH.ScanDir().filePattern( 'DAOD_PHYS.27236297._000003.pool.root.1' ).scan( sh, inputFilePath ) #cutflow
 #ROOT.SH.ScanDir().filePattern( 'DAOD_EXOT3.test.508547.SVJSChan_1500_8.p9364.root' ).scan( sh, inputFilePath ) #jetm9
